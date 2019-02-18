@@ -49,8 +49,12 @@ RUN conda install --quiet --yes \
     'matplotlib=2.2*' \
     'scipy=1.1*' \
     'scikit-learn=0.19*' \
-    'spacy=2.0*' && \
+    'spacy=2.0*' \
+    'gensim=3.4* '&& \
+    /bin/bash -c "source activate base" && \
     pip install PyStemmer && \
+    python -m spacy download en_core_web_sm && \
+
     # Activate ipywidgets extension in the environment that runs the notebook server
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     npm cache clean --force && \
