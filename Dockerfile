@@ -38,11 +38,9 @@ RUN mkdir /home/$NB_USER/nlp_workshop && \
     fix-permissions /home/$NB_USER
 
 COPY nlp_workshop_participant.ipynb nlp_workshop/
-COPY website_data_sample.csv nlp_workshop/
+COPY ./data/website_text.csv nlp_workshop/data/
 
 # Install Python 3 packages
-# Remove pyqt and qt pulled in for matplotlib since we're only ever going to
-# use notebook-friendly backends in these images
 RUN conda install --quiet --yes \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.2*' \
@@ -50,33 +48,16 @@ RUN conda install --quiet --yes \
     'numexpr=2.6*' \
     'matplotlib=2.2*' \
     'scipy=1.1*' \
-    'seaborn=0.9*' \
     'scikit-learn=0.19*' \
-    'cython=0.28*' \
-    'protobuf=3.*' \
-    conda remove --quiet --yes --force qt pyqt && \
-    conda clean -tipsy && \
+    'spacy=2.0*' && \
+    pip install PyStemmer && \
     # Activate ipywidgets extension in the environment that runs the notebook server
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    # Also activate ipywidgets extension for JupyterLab
-    #jupyter labextension install @jupyter-widgets/jupyterlab-manager@^0.37.0 && \
-    #jupyter labextension install jupyterlab_bokeh@^0.6.0 && \
     npm cache clean --force && \
-    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
-
-# Install facets which does not have a pip or conda package at the moment
-# RUN cd /tmp && \
-#     git clone https://github.com/PAIR-code/facets.git && \
-#    cd facets && \
-#    jupyter nbextension install facets-dist/ --sys-prefix && \
-#    cd && \
-#    rm -rf /tmp/facets && \
-#    fix-permissions $CONDA_DIR && \
-#    fix-permissions /home/$NB_USER
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
